@@ -20,12 +20,7 @@ function wrp_shortcode($user_atts = [], $content = null, $tag = '') {
     $atts = shortcode_atts($default_atts, $user_atts, $tag);
 
     $current_post_id = get_the_ID();
-    $current_post_categories = get_the_category();
-
-    $category_ids = [];
-    foreach ($current_post_categories as $current_post_category)    {
-        array_push($category_ids, $current_post_category->term_id);
-    }
+    $category_ids = wp_get_post_terms($current_post_id, 'category', ['fields' => 'ids']);
 
     $posts = new WP_Query([
         'posts_per_page'    =>  $atts['posts'],
