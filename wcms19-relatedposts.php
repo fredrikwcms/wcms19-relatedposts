@@ -11,7 +11,7 @@
 * Domain Path: /languages
 */
 
-function wrp_shortcode($user_atts = [], $content = null, $tag = '') {
+function wrp_get_related_posts($user_atts = [], $content = null, $tag = '') {
     $default_atts = [
         'posts' =>  4,
         'title' =>  __('Related Posts', 'wcms19-relatedposts'),
@@ -59,7 +59,23 @@ function wrp_shortcode($user_atts = [], $content = null, $tag = '') {
     return $output;
 }
 
+function wrp_shortcode($user_atts = [], $content = null, $tag = '') {
+    return wrp_get_related_posts($user_atts, $content, $tag);
+}
+
 function wrp_init() {
     add_shortcode('related-posts', 'wrp_shortcode');
 }
 add_action('init', 'wrp_init');
+
+function wrp_the_content($content)  {
+    if (is_single()) {
+        $related_posts = wrp_get_related_posts();
+        $content = $content . $related_posts;
+        // $content .= $related_posts // More efficient
+        
+    }
+    return $content;
+}
+add_filter('the_content', 'wrp_the_content');
+
