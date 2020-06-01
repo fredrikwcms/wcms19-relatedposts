@@ -1,6 +1,6 @@
 <?php
 function wrp_the_content($content)  {
-    if (is_single()) {
+    if (is_single() && get_option('wrp_add_to_posts') == 1) {
         // If there is NO shortcode called "related-posts" in $content, add it to end of $content
         if (!has_shortcode($content, 'related-posts')) {
             $related_posts = wrp_get_related_posts();

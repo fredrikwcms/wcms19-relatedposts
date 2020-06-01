@@ -1,8 +1,14 @@
 <?php
 function wrp_get_related_posts($user_atts = [], $content = null, $tag = '') {
+    if (!is_single()) {
+        return;
+    }
+
+    $default_title = get_option('wrp_default_title', __('Related Posts', 'wcms19-relatedposts'));
+
     $default_atts = [
         'posts' =>  4,
-        'title' =>  __('Related Posts', 'wcms19-relatedposts'),
+        'title' =>  $default_title,
     ];
 
     $atts = shortcode_atts($default_atts, $user_atts, $tag);
