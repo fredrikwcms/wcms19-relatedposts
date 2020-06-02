@@ -9,16 +9,27 @@ function wrp_get_related_posts($user_atts = [], $content = null, $tag = '') {
     $default_atts = [
         'posts' =>  4,
         'title' =>  $default_title,
+        'categories'    =>  null,
+        'post'      =>  get_the_id(),
+        'show_metadata'     => true,
     ];
+
+
+    if (isset($user_atts['show_metadata']) && $user_atts['show_metadata'] === 'false') {
+        $user_atts['show_metadata'] = false;
+    }
 
     $atts = shortcode_atts($default_atts, $user_atts, $tag);
 
-    $current_post_id = get_the_ID();
-    $category_ids = wp_get_post_terms($current_post_id, 'category', ['fields' => 'ids']);
+    if (!empty($atts['categories'])) {
+        $category_ids = explode(',', $atts['categories']);
+    }   else {
+        $category_ids = wp_get_post_terms($atts['post'], 'category', ['fields' => 'ids']);
+    }
 
     $posts = new WP_Query([
         'posts_per_page'    =>  $atts['posts'],
-        'post__not_in'      =>  [$current_post_id],
+        'post__not_in'      =>  [$atts['post']],
         'category__in'      =>  $category_ids,
     ]);
 
@@ -33,14 +44,16 @@ function wrp_get_related_posts($user_atts = [], $content = null, $tag = '') {
             $output .= get_the_title();
             $output .= "</a>";
 
-            $output .= "<small>";
-            $output .= " in ";
-            $output .= get_the_category_list(', ');
-            $output .= " by ";
-            $output .= get_the_author();
-            $output .= " ";
-            $output .= human_time_diff(get_the_time('U')) . ' ago';
-            $output .= "</small>";
+            if($atts['show_metadata']) {
+                $output .= "<small>";
+                $output .= " in ";
+                $output .= get_the_category_list(', ');
+                $output .= " by ";
+                $output .= get_the_author();
+                $output .= " ";
+                $output .= human_time_diff(get_the_time('U')) . ' ago';
+                $output .= "</small>";
+            }
 
             $output .= "</li>";
         endwhile;
